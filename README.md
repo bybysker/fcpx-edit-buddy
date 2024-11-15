@@ -1,0 +1,1 @@
+# fcpx-edit-buddy
