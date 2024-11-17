@@ -1,5 +1,9 @@
 import mlx_whisper
 
+INITIAL_PROMPT = """Maximum character for a subtitle is 35. Sentence based subtitles.
+Subject: Mes péripéties à rotterdam: mon accueil, recherche de logement et de taff, mon état mental
+"""
+
 def create_srt_from_transcription(transcription_dict, output_file="output.srt"):
     """
     Convert a transcription dictionary to SRT format and save to file.
@@ -64,5 +68,5 @@ def create_srt_from_transcription(transcription_dict, output_file="output.srt"):
     print(f"SRT file '{output_file}' created successfully.")
 
 speech_file = "./data/vlog_rotter_audio.m4a"
-transcription = mlx_whisper.transcribe(speech_file, path_or_hf_repo="mlx-community/whisper-large-v3-mlx", initial_prompt="Mes péripéties à rotterdam: mon accueil, recherche de logement et de taff, mon état mental")
+transcription = mlx_whisper.transcribe(speech_file, path_or_hf_repo="mlx-community/whisper-large-v3-mlx", initial_prompt=INITIAL_PROMPT)
 create_srt_from_transcription(transcription, output_file="vlog_rotter2.srt")

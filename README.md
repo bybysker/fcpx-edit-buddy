@@ -1,5 +1,7 @@
 # FCPX Edit Buddy
 
+#### Todo : manage so that each segment represents a sentence
+
 FCPX Edit Buddy is a tool designed to streamline the video editing workflow by automating the transcription of audio to subtitles and integrating these subtitles seamlessly into Final Cut Pro X (FCPX) projects. Leveraging machine learning for accurate transcription and robust scripting for XML manipulation, FCPX Edit Buddy ensures efficient and accurate subtitle integration, enhancing the overall editing experience.
 
 ## Features
