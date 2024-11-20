@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from tqdm import tqdm
-from src.extract_segments_from_audio import detect_speech_segments, merge_close_segments, get_silence_segments
+from src.extract_segments_from_audio import detect_speech_segments, infer_silence_segments, segment_audio
 from src.add_captions_to_fcpxml import add_captions_to_fcpxml
 
 def process_fcpxml_with_audio_segments(input_xml_file, audio_file, output_xml_file, 
@@ -19,18 +19,8 @@ def process_fcpxml_with_audio_segments(input_xml_file, audio_file, output_xml_fi
         max_gap (float): Maximum gap between segments to merge (in seconds)
     """
     # First, get speech segments from audio
-    print("Analyzing audio segments...")
-    speech_segments = detect_speech_segments(
-        audio_file,
-        min_silence_len=min_silence_len,
-        silence_thresh=silence_thresh,
-        seek_step=seek_step
-    )
-    speech_segments = merge_close_segments(speech_segments, max_gap=max_gap)
-    silence_segments = get_silence_segments(speech_segments, 10)
-    
-    segments = speech_segments + silence_segments
-    segments = sorted(segments, key=lambda x: x['start'])
+    print("Analyzing audio segments...")    
+    segments = segment_audio(audio_file)
 
     # Load the FCPXML file
     print("Loading FCPXML...")
@@ -68,17 +58,23 @@ def process_fcpxml_with_audio_segments(input_xml_file, audio_file, output_xml_fi
             if (orig_clip['offset'] <= segment['start'] < 
                 (orig_clip['offset'] + orig_clip['duration'])):
                 
+                new_clip_start = orig_clip['start'] + segment['start'] - orig_clip['offset']
                 # Create new asset clip
                 new_clip = ET.Element("asset-clip")
                 new_clip.set("ref", orig_clip['ref'])
                 new_clip.set("offset", f"{segment['start']}s")
                 new_clip.set("duration", f"{segment['duration']}s")
                 new_clip.set("name", f"{orig_clip['name']}")
-                new_clip.set("start", f"{segment['start']}s") #TODO: correct to include multiclip timeline
+                new_clip.set("start", f"{new_clip_start}s")
+                if segment['type'] == 'silence':
+                    new_clip.set("audioRole", "Silence")
+                else:
+                    new_clip.set("audioRole", "dialogue")
+                    
                 conform_rate = ET.SubElement(new_clip, "conform-rate")
                 conform_rate.set("scaleEnabled", "0")
                 conform_rate.set("srcFrameRate", "60")
-                
+
                 """
                 # Copy relevant child elements from original clip
                 for child in orig_clip['element']:
@@ -91,13 +87,6 @@ def process_fcpxml_with_audio_segments(input_xml_file, audio_file, output_xml_fi
                     spine.append(new_clip)
                 break
     
-    """
-    # Save the modified FCPXML
-    print("Saving modified FCPXML...")
-    pretty_xml = prettify_xml(root)
-    with open(output_xml_file, 'w', encoding='utf-8') as f:
-        f.write(pretty_xml)
-    """
     # Format the XML with proper indentation
     ET.indent(tree, space="    ")
     tree.write(output_xml_file, encoding="utf-8", xml_declaration=True)

@@ -1,10 +1,11 @@
 import mlx_whisper
 
 INITIAL_PROMPT = """Maximum character for a subtitle is 35. Sentence based subtitles.
-Subject: Mes péripéties à rotterdam: mon accueil, recherche de logement et de taff, mon état mental
+Transcribe silence with "..."
+{subject}
 """
 
-def create_srt_from_transcription(transcription_dict, output_file="output.srt"):
+def create_srt_from_audio(audio_file, subject="General", output_file="output.srt"):
     """
     Convert a transcription dictionary to SRT format and save to file.
     
@@ -19,9 +20,13 @@ def create_srt_from_transcription(transcription_dict, output_file="output.srt"):
         secs = int(seconds % 60)
         milliseconds = int(round((seconds - int(seconds)) * 1000))
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{milliseconds:03d}"
+    
+
+    transcription = mlx_whisper.transcribe(audio_file, path_or_hf_repo="mlx-community/whisper-large-v3-mlx",
+                                            initial_prompt=INITIAL_PROMPT.format(subject=subject))
 
     # Extract and sort segments
-    segments = transcription_dict.get('segments', [])
+    segments = transcription.get('segments', [])
     segments.sort(key=lambda x: x.get('start', 0))
 
     # Process segments to fix overlaps
@@ -66,7 +71,3 @@ def create_srt_from_transcription(transcription_dict, output_file="output.srt"):
             f.write(srt_segment)
     
     print(f"SRT file '{output_file}' created successfully.")
-
-speech_file = "./data/vlog_rotter_audio.m4a"
-transcription = mlx_whisper.transcribe(speech_file, path_or_hf_repo="mlx-community/whisper-large-v3-mlx", initial_prompt=INITIAL_PROMPT)
-create_srt_from_transcription(transcription, output_file="vlog_rotter2.srt")

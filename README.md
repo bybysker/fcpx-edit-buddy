@@ -1,13 +1,11 @@
 # FCPX Edit Buddy
 
-#### Todo : manage so that each segment represents a sentence
-
-FCPX Edit Buddy is a tool designed to streamline the video editing workflow by automating the transcription of audio to subtitles and integrating these subtitles seamlessly into Final Cut Pro X (FCPX) projects. Leveraging machine learning for accurate transcription and robust scripting for XML manipulation, FCPX Edit Buddy ensures efficient and accurate subtitle integration, enhancing the overall editing experience.
+FCPX Edit Buddy is a tool designed to streamline the video editing workflow by automating the transcription of audio to subtitles and integrating these subtitles seamlessly into Final Cut Pro X (FCPX) projects. Leveraging machine learning for accurate transcription and robust scripting for XML manipulation, FCPX Edit Buddy ensures efficient and precise subtitle integration, enhancing the overall editing experience.
 
 ## Features
 
 - **Automatic Transcription**: Converts audio files to text using `mlx-whisper`.
-- **Subtitle Generation**: Transforms transcriptions into SRT (SubRip Subtitle) format.
+- **Subtitle Generation**: Transforms transcriptions into SRT (SubRip Subtitle) format, ensuring each subtitle segment represents a complete sentence for better readability.
 - **FCPXML Integration**: Inserts generated subtitles into FCPX projects by modifying FCPXML files.
 - **Customizable Output**: Allows customization of subtitle formatting and placement.
 - **Easy Installation**: Simple setup with all dependencies managed via `requirements.txt`.
@@ -68,7 +66,7 @@ The `audio_to_srt.py` script handles the transcription of audio files into SRT f
    python src/audio_to_srt.py
    ```
 
-   This will generate an `output.srt` file in the project root.
+   This will generate an `output.srt` file in the project root, with each subtitle segment corresponding to a complete sentence for improved clarity.
 
 ### Integrate SRT into FCPX
 
