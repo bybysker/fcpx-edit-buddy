@@ -3,3 +3,4 @@ pysrt
 pydub
 python-dotenv
 srt
+openai
